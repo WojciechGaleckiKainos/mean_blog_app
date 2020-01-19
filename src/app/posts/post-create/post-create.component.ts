@@ -9,8 +9,6 @@ import {PostsService} from '../posts.service';
   styleUrls: ['./post-create.component.css']
 })
 export class PostCreateComponent {
-  postTitle = '';
-  postContent = '';
 
   constructor(public postsService: PostsService) {
   }
@@ -24,5 +22,6 @@ export class PostCreateComponent {
       content: form.value.content
     };
     this.postsService.addPost(post);
+    form.resetForm();
   }
 }
