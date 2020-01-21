@@ -11,6 +11,7 @@ import {ActivatedRoute} from '@angular/router';
 })
 export class PostCreateComponent implements OnInit {
   post: Post;
+  isLoading = false;
   private mode = 'create';
   private postId: string;
 
@@ -22,14 +23,15 @@ export class PostCreateComponent implements OnInit {
       if (paramMap.has('postId')) {
         this.mode = 'edit';
         this.postId = paramMap.get('postId');
-        this.postsService.getPost(this.postId)
-          .subscribe(postData => {
-            this.post = {
-              id: postData._id,
-              title: postData.title,
-              content: postData.content
-            };
-          });
+        this.isLoading = true;
+        this.postsService.getPost(this.postId).subscribe(postData => {
+          this.isLoading = false;
+          this.post = {
+            id: postData._id,
+            title: postData.title,
+            content: postData.content
+          };
+        });
       } else {
         this.mode = 'create';
         this.postId = null;
@@ -46,6 +48,8 @@ export class PostCreateComponent implements OnInit {
       title: form.value.title,
       content: form.value.content
     };
+
+    this.isLoading = true;
 
     if (this.mode === 'create') {
       this.postsService.addPost(postToSave);

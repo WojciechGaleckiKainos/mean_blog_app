@@ -3,6 +3,7 @@ import {Post} from './post.model';
 import {Subject} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {map} from 'rxjs/operators';
+import {Router} from '@angular/router';
 
 @Injectable({
   providedIn: 'root' // singleton
@@ -11,7 +12,7 @@ export class PostsService {
   private posts: Post[] = [];
   private postsUpdated = new Subject<Post[]>();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
   }
 
   getPosts() {
@@ -33,7 +34,7 @@ export class PostsService {
   }
 
   getPost(id: string) {
-    return this.http.get<{_id: string, title: string, content: string}>('http://localhost:3000/api/posts/' + id);
+    return this.http.get<{ _id: string, title: string, content: string }>('http://localhost:3000/api/posts/' + id);
   }
 
   getPostUpdateListener() {
@@ -41,11 +42,12 @@ export class PostsService {
   }
 
   addPost(post: Post) {
-    this.http.post<{postId: string}>('http://localhost:3000/api/posts', post)
+    this.http.post<{ postId: string }>('http://localhost:3000/api/posts', post)
       .subscribe(responseData => {
         post.id = responseData.postId;
         this.posts.push(post);
         this.postsUpdated.next([...this.posts]);
+        this.redirectToTheHomePage();
       });
   }
 
@@ -57,6 +59,7 @@ export class PostsService {
         updatedPosts[oldPostIndex] = post;
         this.posts = updatedPosts;
         this.postsUpdated.next([...this.posts]);
+        this.redirectToTheHomePage();
         console.log('Successfully updated post!');
       });
   }
@@ -68,5 +71,9 @@ export class PostsService {
         this.postsUpdated.next([...this.posts]);
         console.log('Successfully deleted post!');
       });
+  }
+
+  redirectToTheHomePage() {
+    this.router.navigate(['/']);
   }
 }
