@@ -3,6 +3,7 @@ import {Component, OnInit} from '@angular/core';
 import {PostsService} from '../posts.service';
 import {ActivatedRoute} from '@angular/router';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {mimeType} from './image.validator';
 
 enum Mode {
   Create,
@@ -86,7 +87,8 @@ export class PostCreateComponent implements OnInit {
         validators: [Validators.required]
       }),
       image: new FormControl(null, {
-        validators: [Validators.required]
+        validators: [Validators.required],
+        asyncValidators: [mimeType]
       })
     });
   }
