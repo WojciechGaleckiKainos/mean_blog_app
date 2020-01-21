@@ -1,8 +1,13 @@
-import {Post} from './../post.model';
+import {Post} from '../post.model';
 import {Component, OnInit} from '@angular/core';
-import {NgForm} from '@angular/forms';
 import {PostsService} from '../posts.service';
 import {ActivatedRoute} from '@angular/router';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
+
+enum Mode {
+  Create,
+  Edit
+}
 
 @Component({
   selector: 'app-post-create',
@@ -12,16 +17,18 @@ import {ActivatedRoute} from '@angular/router';
 export class PostCreateComponent implements OnInit {
   post: Post;
   isLoading = false;
-  private mode = 'create';
+  form: FormGroup;
+  private mode = Mode.Create;
   private postId: string;
 
   constructor(public postsService: PostsService, public route: ActivatedRoute) {
   }
 
   ngOnInit(): void {
+    this.setUpForm();
     this.route.paramMap.subscribe((paramMap) => {
       if (paramMap.has('postId')) {
-        this.mode = 'edit';
+        this.mode = Mode.Edit;
         this.postId = paramMap.get('postId');
         this.isLoading = true;
         this.postsService.getPost(this.postId).subscribe(postData => {
@@ -31,32 +38,45 @@ export class PostCreateComponent implements OnInit {
             title: postData.title,
             content: postData.content
           };
+          this.form.setValue({
+            title: this.post.title,
+            content: this.post.content
+          });
         });
       } else {
-        this.mode = 'create';
+        this.mode = Mode.Create;
         this.postId = null;
       }
     });
   }
 
-  onSavePost(form: NgForm) {
-    if (form.invalid) {
+  onSavePost() {
+    if (this.form.invalid) {
       return;
     }
-
     const postToSave: Post = {
-      title: form.value.title,
-      content: form.value.content
+      title: this.form.value.title,
+      content: this.form.value.content
     };
-
     this.isLoading = true;
 
-    if (this.mode === 'create') {
+    if (this.mode === Mode.Create) {
       this.postsService.addPost(postToSave);
     } else {
       postToSave.id = this.postId;
       this.postsService.updatePost(postToSave);
     }
-    form.resetForm();
+    this.form.reset();
+  }
+
+  private setUpForm() {
+    this.form = new FormGroup({
+      title: new FormControl(null, {
+        validators: [Validators.required, Validators.minLength(3)]
+      }),
+      content: new FormControl(null, {
+        validators: [Validators.required]
+      })
+    });
   }
 }
