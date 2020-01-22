@@ -23,7 +23,8 @@ export class PostsService {
           return {
             title: post.title,
             content: post.content,
-            id: post._id
+            id: post._id,
+            imagePath: post.imagePath
           };
         });
       }))
@@ -34,7 +35,8 @@ export class PostsService {
   }
 
   getPost(id: string) {
-    return this.http.get<{ _id: string, title: string, content: string }>('http://localhost:3000/api/posts/' + id);
+    return this.http.get<{ _id: string, title: string, content: string , imagePath: string}>(
+      'http://localhost:3000/api/posts/' + id);
   }
 
   getPostUpdateListener() {
@@ -42,9 +44,15 @@ export class PostsService {
   }
 
   addPost(post: Post) {
-    this.http.post<{ postId: string }>('http://localhost:3000/api/posts', post)
+    const postData = new FormData();
+    postData.append('title', post.title);
+    postData.append('content', post.content);
+    postData.append('image', post.image, post.title);
+
+    this.http.post<{ postId: string, imagePath: string}>('http://localhost:3000/api/posts', postData)
       .subscribe(responseData => {
         post.id = responseData.postId;
+        post.imagePath = responseData.imagePath;
         this.posts.push(post);
         this.postsUpdated.next([...this.posts]);
         this.redirectToTheHomePage();
