@@ -28,13 +28,17 @@ const fileStorage = multer.diskStorage({
   }
 });
 
+function extractedImagePathFromRequest(req) {
+  const url = req.protocol + '://' + req.get('host');
+  return url + '/images/' + req.file.filename;
+}
+
 // add new post
 router.post('', multer({storage: fileStorage}).single('image'), (req, res, next) => {
-  const url = req.protocol + '://' + req.get('host');
   const post = new Post({
     title: req.body.title,
     content: req.body.content,
-    imagePath: url + '/images/' + req.file.filename
+    imagePath: extractedImagePathFromRequest(req)
   });
   console.log('Received add post request:');
   console.log(post);
@@ -72,15 +76,21 @@ router.get('/:id', (req, res, next) => {
 });
 
 // update post by id
-router.put('/:id', (req, res, next) => {
+router.put('/:id', multer({storage: fileStorage}).single('image'), (req, res, next) => {
+  console.log('Received update post request:');
+  console.log(req.body.id);
+  let imagePath = req.body.imagePath;
+
+  if (req.file) {
+    console.log('Update request contains new file');
+    imagePath = extractedImagePathFromRequest(req);
+  }
   const post = new Post({
     _id: req.body.id,
     title: req.body.title,
-    content: req.body.content
+    content: req.body.content,
+    imagePath: imagePath
   });
-  console.log('Received update post request:');
-  console.log(req.body.id);
-  console.log(post);
   Post.updateOne({_id: req.params.id}, post)
     .then(result => {
       console.log(result);
