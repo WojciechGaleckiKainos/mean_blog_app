@@ -21,6 +21,6 @@ export class SignupComponent {
       email: form.value.email,
       password: form.value.password
     };
-    this.authService.createUser(authData);
+    this.authService.registerUser(authData);
   }
 }

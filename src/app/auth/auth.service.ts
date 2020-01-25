@@ -11,10 +11,17 @@ export class AuthService {
   constructor(private http: HttpClient) {
   }
 
-  createUser(authData: AuthData) {
+  registerUser(authData: AuthData) {
     this.http.post(this.url + '/signup', authData)
       .subscribe(response => {
-        console.log('Successfully registered new user');
+        console.log('Successfully registered a new user');
+      });
+  }
+
+  loginUser(authData: AuthData) {
+    this.http.post(this.url + '/login', authData)
+      .subscribe(response => {
+        console.log('Successfully login a user');
       });
   }
 }
