@@ -7,6 +7,7 @@ import {HttpClient} from '@angular/common/http';
 })
 export class AuthService {
   private url = 'http://localhost:3000/api/user';
+  private token: string;
 
   constructor(private http: HttpClient) {
   }
@@ -19,9 +20,14 @@ export class AuthService {
   }
 
   loginUser(authData: AuthData) {
-    this.http.post(this.url + '/login', authData)
+    this.http.post<{ token: string }>(this.url + '/login', authData)
       .subscribe(response => {
+        this.token = response.token;
         console.log('Successfully login a user');
       });
+  }
+
+  getToken() {
+    return this.token;
   }
 }

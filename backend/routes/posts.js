@@ -4,6 +4,7 @@ const multer = require('multer');
 const router = express.Router();
 
 const Post = require('../models/post');
+const checkAuth = require('../middleware/check-auth');
 
 const MIME_TYPE_MAP = {
   'image/png': 'png',
@@ -34,21 +35,25 @@ function extractedImagePathFromRequest(req) {
 }
 
 // add new post
-router.post('', multer({storage: fileStorage}).single('image'), (req, res, next) => {
-  const post = new Post({
-    title: req.body.title,
-    content: req.body.content,
-    imagePath: extractedImagePathFromRequest(req)
-  });
-  console.log('Received add post request:');
-  console.log(post);
-  post.save().then(createdPost => {
-    res.status(201).json({
-      postId: createdPost._id,
-      imagePath: createdPost.imagePath
+router.post(
+  '',
+  checkAuth,
+  multer({storage: fileStorage}).single('image'),
+  (req, res, next) => {
+    const post = new Post({
+      title: req.body.title,
+      content: req.body.content,
+      imagePath: extractedImagePathFromRequest(req)
+    });
+    console.log('Received add post request:');
+    console.log(post);
+    post.save().then(createdPost => {
+      res.status(201).json({
+        postId: createdPost._id,
+        imagePath: createdPost.imagePath
+      });
     });
   });
-});
 
 // get all posts
 router.get('', (req, res, next) => {
@@ -90,37 +95,44 @@ router.get('/:id', (req, res, next) => {
 });
 
 // update post by id
-router.put('/:id', multer({storage: fileStorage}).single('image'), (req, res, next) => {
-  console.log('Received update post request:');
-  console.log(req.body.id);
-  let imagePath = req.body.imagePath;
+router.put(
+  '/:id',
+  checkAuth,
+  multer({storage: fileStorage}).single('image'),
+  (req, res, next) => {
+    console.log('Received update post request:');
+    console.log(req.body.id);
+    let imagePath = req.body.imagePath;
 
-  if (req.file) {
-    console.log('Update request contains new file');
-    imagePath = extractedImagePathFromRequest(req);
-  }
-  const post = new Post({
-    _id: req.body.id,
-    title: req.body.title,
-    content: req.body.content,
-    imagePath: imagePath
+    if (req.file) {
+      console.log('Update request contains new file');
+      imagePath = extractedImagePathFromRequest(req);
+    }
+    const post = new Post({
+      _id: req.body.id,
+      title: req.body.title,
+      content: req.body.content,
+      imagePath: imagePath
+    });
+    Post.updateOne({_id: req.params.id}, post)
+      .then(result => {
+        console.log(result);
+        res.status(200).json();
+      })
   });
-  Post.updateOne({_id: req.params.id}, post)
-    .then(result => {
-      console.log(result);
-      res.status(200).json();
-    })
-});
 
 // delete post by id
-router.delete('/:id', (req, res, next) => {
-  console.log('Received delete request for post with id: ');
-  console.log(req.params.id);
-  Post.deleteOne({_id: req.params.id})
-    .then(result => {
-      console.log(result);
-      res.status(200).json();
-    });
-});
+router.delete(
+  '/:id',
+  checkAuth,
+  (req, res, next) => {
+    console.log('Received delete request for post with id: ');
+    console.log(req.params.id);
+    Post.deleteOne({_id: req.params.id})
+      .then(result => {
+        console.log(result);
+        res.status(200).json();
+      });
+  });
 
 module.exports = router;
