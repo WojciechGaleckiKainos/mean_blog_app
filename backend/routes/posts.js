@@ -43,7 +43,8 @@ router.post(
     const post = new Post({
       title: req.body.title,
       content: req.body.content,
-      imagePath: extractedImagePathFromRequest(req)
+      imagePath: extractedImagePathFromRequest(req),
+      owner: req.userData.userId
     });
     console.log('Received add post request:');
     console.log(post);
@@ -112,13 +113,18 @@ router.put(
       _id: req.body.id,
       title: req.body.title,
       content: req.body.content,
-      imagePath: imagePath
+      imagePath: imagePath,
+      owner: req.userData.userId
     });
-    Post.updateOne({_id: req.params.id}, post)
+    Post.updateOne({_id: req.params.id, owner: req.userData.userId}, post)
       .then(result => {
         console.log(result);
-        res.status(200).json();
-      })
+        if (result.nModified > 0) {
+          res.status(200).json();
+        } else {
+          res.status(401).json();
+        }
+      });
   });
 
 // delete post by id
@@ -128,10 +134,14 @@ router.delete(
   (req, res, next) => {
     console.log('Received delete request for post with id: ');
     console.log(req.params.id);
-    Post.deleteOne({_id: req.params.id})
+    Post.deleteOne({_id: req.params.id, owner: req.userData.userId})
       .then(result => {
         console.log(result);
-        res.status(200).json();
+        if (result.n > 0) {
+          res.status(200).json();
+        } else {
+          res.status(401).json();
+        }
       });
   });
 

@@ -27,7 +27,8 @@ export class PostsService {
               title: post.title,
               content: post.content,
               id: post._id,
-              imagePath: post.imagePath
+              imagePath: post.imagePath,
+              owner: post.owner
             };
           }),
           totalPosts: postData.totalPosts
@@ -43,7 +44,7 @@ export class PostsService {
   }
 
   getPost(id: string) {
-    return this.http.get<{ _id: string, title: string, content: string, imagePath: string }>(
+    return this.http.get<{ _id: string, title: string, content: string, imagePath: string, owner: string}>(
       this.url + '/' + id);
   }
 
@@ -59,6 +60,7 @@ export class PostsService {
 
     this.http.post<{ postId: string, imagePath: string }>(this.url, postData)
       .subscribe(responseData => {
+        console.log('Successfully added post');
         this.redirectToTheHomePage();
       });
   }
@@ -77,13 +79,14 @@ export class PostsService {
         id: post.id,
         title: post.title,
         content: post.content,
-        imagePath: post.image
+        imagePath: post.image,
+        owner: null // handled in the backend
       };
     }
     this.http.put(this.url + '/' + post.id, postData)
       .subscribe(response => {
         this.redirectToTheHomePage();
-        console.log('Successfully updated post!');
+        console.log('Successfully updated post');
       });
   }
 

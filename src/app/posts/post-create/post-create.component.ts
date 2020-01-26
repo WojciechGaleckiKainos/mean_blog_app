@@ -39,7 +39,8 @@ export class PostCreateComponent implements OnInit {
             id: postData._id,
             title: postData.title,
             content: postData.content,
-            imagePath: postData.imagePath
+            imagePath: postData.imagePath,
+            owner: postData.owner
           };
           this.form.setValue({
             title: this.post.title,
@@ -49,7 +50,7 @@ export class PostCreateComponent implements OnInit {
         });
       } else {
         this.mode = Mode.Create;
-        this.postId = null;
+        this.postId = null; // handled in the backend
       }
     });
   }
@@ -68,7 +69,8 @@ export class PostCreateComponent implements OnInit {
     const postToSave: Post = {
       title: this.form.value.title,
       content: this.form.value.content,
-      image: this.form.value.image
+      image: this.form.value.image,
+      owner: null
     };
     this.isLoading = true;
 
