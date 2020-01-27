@@ -3,13 +3,15 @@ import {AuthData} from './auth-data.model';
 import {HttpClient} from '@angular/common/http';
 import {Subject} from 'rxjs';
 import {Router} from '@angular/router';
+import {environment} from '../../environments/environment';
+
+const URL = environment.apiUrl + '/user';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private isAuthenticated = false;
-  private url = 'http://localhost:3000/api/user';
   private token: string;
   private authStatusListener = new Subject<boolean>();
   private tokenTimer: any;
@@ -22,7 +24,7 @@ export class AuthService {
   }
 
   registerUser(authData: AuthData) {
-    this.http.post(this.url + '/signup', authData)
+    this.http.post(URL + '/signup', authData)
       .subscribe(response => {
         this.redirectToTheHomePage();
         console.log('Successfully registered a new user');
@@ -32,7 +34,7 @@ export class AuthService {
   }
 
   loginUser(authData: AuthData) {
-    this.http.post<{ token: string, expiresIn: number, userId: string }>(this.url + '/login', authData)
+    this.http.post<{ token: string, expiresIn: number, userId: string }>(URL + '/login', authData)
       .subscribe(response => {
         this.token = response.token;
         if (this.token) {

@@ -7,7 +7,7 @@ const path = require('path');
 
 const app = express();
 
-mongoose.connect('mongodb+srv://wojtek_user:IA1UtuP3hFkfRO84@cluster0-ycrgo.mongodb.net/post-db')
+mongoose.connect(`mongodb+srv://${process.env.MONGO_ATLAS_USER}:${process.env.MONGO_ATLAS_PW}@cluster0-ycrgo.mongodb.net/post-db`)
   .then(() => {
     console.log('Successfully connected to database!')
   })

@@ -4,6 +4,9 @@ import {Subject} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {map} from 'rxjs/operators';
 import {Router} from '@angular/router';
+import {environment} from '../../environments/environment';
+
+const URL = environment.apiUrl + '/posts';
 
 @Injectable({
   providedIn: 'root' // singleton
@@ -11,7 +14,6 @@ import {Router} from '@angular/router';
 export class PostsService {
   private posts: Post[] = [];
   private postsUpdated = new Subject<{ posts: Post[], totalPosts: number }>();
-  private url = 'http://localhost:3000/api/posts';
 
   constructor(private http: HttpClient, private router: Router) {
   }
@@ -19,7 +21,7 @@ export class PostsService {
   getPosts(currentPage: number, postsPerPage: number) {
     const queryParams = `?pageSize=${postsPerPage}&page=${currentPage}`;
     this.http
-      .get<{ message: string, posts: any, totalPosts: number }>(this.url + queryParams)
+      .get<{ message: string, posts: any, totalPosts: number }>(URL + queryParams)
       .pipe(map((postData) => {
         return {
           posts: postData.posts.map(post => {
@@ -45,7 +47,7 @@ export class PostsService {
 
   getPost(id: string) {
     return this.http.get<{ _id: string, title: string, content: string, imagePath: string, owner: string}>(
-      this.url + '/' + id);
+      URL + '/' + id);
   }
 
   getPostUpdateListener() {
@@ -58,7 +60,7 @@ export class PostsService {
     postData.append('content', post.content);
     postData.append('image', post.image, post.title);
 
-    this.http.post<{ postId: string, imagePath: string }>(this.url, postData)
+    this.http.post<{ postId: string, imagePath: string }>(URL, postData)
       .subscribe(responseData => {
         console.log('Successfully added post');
         this.redirectToTheHomePage();
@@ -83,7 +85,7 @@ export class PostsService {
         owner: null // handled in the backend
       };
     }
-    this.http.put(this.url + '/' + post.id, postData)
+    this.http.put(URL + '/' + post.id, postData)
       .subscribe(response => {
         this.redirectToTheHomePage();
         console.log('Successfully updated post');
@@ -91,7 +93,7 @@ export class PostsService {
   }
 
   deletePost(postId: string) {
-    return this.http.delete(this.url + '/' + postId);
+    return this.http.delete(URL + '/' + postId);
   }
 
   redirectToTheHomePage() {
