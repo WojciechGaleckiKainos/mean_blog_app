@@ -1,7 +1,0 @@
-{
-  "env": {
-    "MONGO_ATLAS_USER": "wojtek_user",
-    "MONGO_ATLAS_PW": "IA1UtuP3hFkfRO84",
-    "JWT_KEY": "secret_development_value"
-  }
-}
