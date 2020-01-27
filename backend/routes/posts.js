@@ -48,12 +48,18 @@ router.post(
     });
     console.log('Received add post request:');
     console.log(post);
-    post.save().then(createdPost => {
-      res.status(201).json({
-        postId: createdPost._id,
-        imagePath: createdPost.imagePath
+    post.save()
+      .then(createdPost => {
+        res.status(201).json({
+          postId: createdPost._id,
+          imagePath: createdPost.imagePath
+        });
+      })
+      .catch(error => {
+        res.status(500).json({
+          message: 'Creating new post failed!'
+        });
       });
-    });
   });
 
 // get all posts
@@ -80,6 +86,11 @@ router.get('', (req, res, next) => {
         totalPosts: count
       });
     })
+    .catch(error => {
+      res.status(500).json({
+        message: 'Fetching posts failed!'
+      });
+    });
 });
 
 // get post by id
@@ -93,6 +104,11 @@ router.get('/:id', (req, res, next) => {
         res.status(404).json({message: 'Post not found!'});
       }
     })
+    .catch(error => {
+      res.status(500).json({
+        message: 'Fetching post failed!'
+      });
+    });
 });
 
 // update post by id
@@ -124,6 +140,11 @@ router.put(
         } else {
           res.status(401).json();
         }
+      })
+      .catch(error => {
+        res.status(500).json({
+          message: "Couldn't update a post!"
+        })
       });
   });
 
@@ -142,6 +163,11 @@ router.delete(
         } else {
           res.status(401).json();
         }
+      })
+      .catch(error => {
+        res.status(500).json({
+          message: 'Deleting post failed!'
+        })
       });
   });
 

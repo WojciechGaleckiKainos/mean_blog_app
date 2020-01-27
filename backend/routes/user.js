@@ -6,6 +6,8 @@ const User = require('../models/user');
 
 const router = express.Router();
 
+const INVALID_CREDENTIALS = 'Invalid authentication credentials!';
+
 // register user
 router.post('/signup', (req, res, next) => {
   console.log('Received signup request');
@@ -20,7 +22,9 @@ router.post('/signup', (req, res, next) => {
           res.status(201).json();
         })
         .catch(err => {
-          res.status(500).json({error: err});
+          res.status(401).json({
+            message: INVALID_CREDENTIALS
+          });
         });
     });
 });
@@ -59,7 +63,7 @@ router.post('/login', (req, res, next) => {
 
 function returnAuthFailedResponse(res) {
   return res.status(401).json({
-    message: 'Authentication failed!'
+    message: INVALID_CREDENTIALS
   });
 }
 

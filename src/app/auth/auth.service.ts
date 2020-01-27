@@ -26,6 +26,8 @@ export class AuthService {
       .subscribe(response => {
         this.redirectToTheHomePage();
         console.log('Successfully registered a new user');
+      }, error => {
+        this.authStatusListener.next(false);
       });
   }
 
@@ -43,6 +45,8 @@ export class AuthService {
           this.redirectToTheHomePage();
           console.log('Successfully login a user');
         }
+      }, error => {
+        this.authStatusListener.next(false);
       });
   }
 
