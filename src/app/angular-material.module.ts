@@ -11,7 +11,6 @@ import {
 } from '@angular/material';
 
 @NgModule({
-  declarations: [],
   exports: [
     MatInputModule,
     MatCardModule,
